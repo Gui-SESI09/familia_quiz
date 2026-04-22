@@ -1,0 +1,45 @@
+@baseUrl = http://localhost:3000
+
+### 1. Aluno cria o formulário
+# @name criarFormulario
+POST {{baseUrl}}/formularios
+Content-Type: application/json
+
+{
+    "nome": "Quiz do Lucas"
+}
+
+### ID do formulário retornado no passo 1 (substitua se necessário)
+@formId = 1
+
+### 2. Aluno adiciona questões ao formulário
+POST {{baseUrl}}/questoes
+Content-Type: application/json
+
+{
+    "formulario_id": {{formId}},
+    "enunciado": "Qual o tamanho do meu pé?",
+    "a": "39",
+    "b": "40",
+    "c": "41",
+    "d": "42",
+    "correta": "B"
+}
+
+### 3. Pai busca as questões do formulário para responder
+GET {{baseUrl}}/formularios/{{formId}}/questoes
+
+### 4. Pai envia suas respostas (supondo id da questão seja 1)
+POST {{baseUrl}}/tentativas
+Content-Type: application/json
+
+{
+    "formulario_id": {{formId}},
+    "nome_pai": "Roberto",
+    "respostas_pai": [
+        { "questao_id": 1, "escolha": "B" }
+    ]
+}
+
+### 5. Ver Ranking do formulário
+GET {{baseUrl}}/ranking/{{formId}}

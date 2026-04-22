@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dia da Família - Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <nav class="bg-indigo-600 p-4 shadow-md mb-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-white text-2xl font-bold tracking-tight">Família na Escola</h1>
+            <button onclick="showSection('home')" class="text-indigo-100 hover:text-white transition">Início</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 max-w-4xl">
+        
+        <section id="home" class="space-y-6">
+            <div class="text-center py-10">
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Bem-vindos ao Dia da Família!</h2>
+                <p class="text-lg text-slate-600">Escolha uma das opções abaixo para começar.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer" onclick="showSection('aluno')">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">Área do Aluno</h3>
+                    <p class="text-slate-500">Crie seu formulário e suas perguntas personalizadas.</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer" onclick="loadFormsForParent()">
+                    <h3 class="text-xl font-bold text-emerald-600 mb-2">Área dos Pais</h3>
+                    <p class="text-slate-500">Responda ao quiz e veja sua posição no ranking.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="aluno" class="hidden space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold mb-6">Criar Novo Formulário</h2>
+                <div class="flex gap-4">
+                    <input type="text" id="formNome" placeholder="Ex: Quiz do Bruno" class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <button onclick="createForm()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition">Criar</button>
+                </div>
+            </div>
+
+            <div id="questoesContainer" class="hidden bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-xl font-bold mb-6">Adicionar Questão ao <span id="currentFormName" class="text-indigo-600"></span></h3>
+                <div class="space-y-4">
+                    <input type="text" id="qEnunciado" placeholder="Pergunta (Ex: Qual o tamanho do meu pé?)" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="qA" placeholder="Opção A" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="qB" placeholder="Opção B" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="qC" placeholder="Opção C" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="qD" placeholder="Opção D" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <select id="qCorreta" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        <option value="">Selecione a Resposta Correta</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                    <button onclick="addQuestion()" class="w-full bg-slate-800 text-white py-3 rounded-lg font-bold hover:bg-slate-900 transition">Salvar Questão</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="pais" class="hidden space-y-6">
+            <h2 class="text-2xl font-bold">Selecione o Quiz do seu Filho(a)</h2>
+            <div id="listaFormularios" class="grid gap-4"></div>
+        </section>
+
+        <section id="responder" class="hidden space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h2 id="quizTitle" class="text-2xl font-bold mb-6 text-center">Respondendo Quiz</h2>
+                <div class="mb-6 border-b pb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Seu Nome:</label>
+                    <input type="text" id="nomePai" placeholder="Digite seu nome completo" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div id="questoesQuiz" class="space-y-8"></div>
+                <button onclick="submitQuiz()" class="w-full mt-8 bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition">Finalizar e Ver Resultado</button>
+            </div>
+        </section>
+
+        <section id="ranking" class="hidden space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold mb-6 text-center">Ranking de Acertos</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="py-4 font-semibold text-slate-600">Posição</th>
+                                <th class="py-4 font-semibold text-slate-600">Nome</th>
+                                <th class="py-4 font-semibold text-slate-600 text-right">Acertos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingTableBody"></tbody>
+                    </table>
+                </div>
+                <button onclick="showSection('home')" class="w-full mt-8 border border-slate-300 py-3 rounded-lg font-semibold hover:bg-slate-50 transition">Voltar ao Início</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        let currentFormId = null;
+
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        async function createForm() {
+            const nome = document.getElementById('formNome').value;
+            const response = await fetch(`${API_URL}/formularios`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome })
+            });
+            const data = await response.json();
+            currentFormId = data.id;
+            document.getElementById('currentFormName').innerText = data.nome;
+            document.getElementById('questoesContainer').classList.remove('hidden');
+        }
+
+        async function addQuestion() {
+            const payload = {
+                formulario_id: currentFormId,
+                enunciado: document.getElementById('qEnunciado').value,
+                a: document.getElementById('qA').value,
+                b: document.getElementById('qB').value,
+                c: document.getElementById('qC').value,
+                d: document.getElementById('qD').value,
+                correta: document.getElementById('qCorreta').value
+            };
+
+            await fetch(`${API_URL}/questoes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            ['qEnunciado', 'qA', 'qB', 'qC', 'qD', 'qCorreta'].forEach(id => document.getElementById(id).value = '');
+            alert('Questão adicionada!');
+        }
+
+        async function loadFormsForParent() {
+            const response = await fetch(`${API_URL}/formularios/1/questoes`); 
+            const formsResponse = await fetch(`${API_URL}/formularios/all`); 
+            
+            const forms = [{id: 1, nome: "Quiz do Lucas"}]; 
+            
+            const container = document.getElementById('listaFormularios');
+            container.innerHTML = '';
+            
+            forms.forEach(f => {
+                container.innerHTML += `
+                    <div onclick="startQuiz(${f.id}, '${f.nome}')" class="bg-white p-6 rounded-xl border border-slate-200 flex justify-between items-center hover:border-emerald-500 cursor-pointer transition">
+                        <span class="font-bold text-lg">${f.nome}</span>
+                        <span class="text-emerald-600 font-semibold text-sm">Responder →</span>
+                    </div>
+                `;
+            });
+            showSection('pais');
+        }
+
+        async function startQuiz(id, nome) {
+            currentFormId = id;
+            document.getElementById('quizTitle').innerText = nome;
+            const response = await fetch(`${API_URL}/formularios/${id}/questoes`);
+            const questoes = await response.json();
+            
+            const container = document.getElementById('questoesQuiz');
+            container.innerHTML = '';
+            
+            questoes.forEach((q, index) => {
+                container.innerHTML += `
+                    <div class="space-y-4">
+                        <p class="font-bold text-lg text-slate-700">${index + 1}. ${q.enunciado}</p>
+                        <div class="grid gap-2">
+                            ${['a', 'b', 'c', 'd'].map(opt => `
+                                <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50 transition">
+                                    <input type="radio" name="q${q.id}" value="${opt.toUpperCase()}" class="w-4 h-4 text-emerald-600">
+                                    <span>${q['opcao_' + opt]}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            showSection('responder');
+        }
+
+        async function submitQuiz() {
+            const nomePai = document.getElementById('nomePai').value;
+            const radios = document.querySelectorAll('#questoesQuiz input[type="radio"]:checked');
+            const respostas = Array.from(radios).map(r => ({
+                questao_id: parseInt(r.name.replace('q', '')),
+                escolha: r.value
+            }));
+
+            await fetch(`${API_URL}/tentativas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    formulario_id: currentFormId,
+                    nome_pai: nomePai,
+                    respostas_pai: respostas
+                })
+            });
+
+            loadRanking(currentFormId);
+        }
+
+        async function loadRanking(id) {
+            const response = await fetch(`${API_URL}/ranking/${id}`);
+            const ranking = await response.json();
+            const body = document.getElementById('rankingTableBody');
+            body.innerHTML = '';
+            
+            ranking.forEach((pos, index) => {
+                body.innerHTML += `
+                    <tr class="border-b last:border-0">
+                        <td class="py-4 font-bold text-slate-400">#${index + 1}</td>
+                        <td class="py-4 font-semibold text-slate-800">${pos.nome_pai}</td>
+                        <td class="py-4 text-right font-bold text-emerald-600">${pos.acertos}</td>
+                    </tr>
+                `;
+            });
+            showSection('ranking');
+        }
+    </script>
+</body>
+</html>
