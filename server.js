@@ -8,7 +8,7 @@ dotenv.config()
 const app = Fastify();
 const { Pool } = pg;
 
-await fastify.register(cors, {
+await app.register(cors, {
     origin: '*'
 });
 
