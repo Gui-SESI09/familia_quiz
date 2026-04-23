@@ -1,33 +1,27 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import pg from 'pg';
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
 
 const app = Fastify();
 const { Pool } = pg;
 
+// Configuração do CORS usando a variável 'app' correta
 await app.register(cors, {
     origin: '*'
 });
 
+// Configuração do Banco de Dados (Neon/PostgreSQL)
 const pool = new Pool({
     connectionString: process.env.url_bd,
     ssl: {
         rejectUnauthorized: false
     }
-})
+});
 
-// const pool = new Pool({
-//     user: 'postgres',
-//     password: 'senai',
-//     host: 'localhost',
-//     database: 'familia_quiz',
-//     port: 5432
-// })
-
-app.register(cors, { origin: '*' });
+// --- ROTAS ---
 
 app.post('/formularios', async (request, reply) => {
     const { nome } = request.body;
@@ -83,6 +77,19 @@ app.get('/formularios', async (request, reply) => {
     return result.rows;
 });
 
-app.listen({ port: 3000 }).then(() => {
-    console.log('Servidor rodando em http://localhost:3000');
-});
+// --- INICIALIZAÇÃO (Configurada para o Render) ---
+
+const start = async () => {
+    try {
+        await app.listen({ 
+            port: process.env.PORT || 3000, 
+            host: '0.0.0.0' 
+        });
+        console.log(`Servidor rodando na porta ${process.env.PORT || 3000}`);
+    } catch (err) {
+        app.log.error(err);
+        process.exit(1);
+    }
+};
+
+start();
