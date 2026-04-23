@@ -13,7 +13,7 @@ await fastify.register(cors, {
 });
 
 const pool = new Pool({
-    connectionString: process.env.url_bd
+    connectionString: process.env.url_bd,
     ssl: {
         rejectUnauthorized: false
     }
